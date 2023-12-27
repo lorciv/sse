@@ -8,8 +8,6 @@ import (
 )
 
 // Stream is an HTTP event stream.
-// It implements the http.Handler interface, through which clients can subscribe to new events.
-// It exposes Send methods, that the server can use to notify all active listeners.
 type Stream struct {
 	requests chan request
 	channels []chan message
@@ -18,20 +16,22 @@ type Stream struct {
 }
 
 // NewStream returns a new event stream that is ready to use.
+// A Stream implements the http.Handler interface, through which clients can subscribe to new events.
+// It also exposes Send and SendEvent methods, which can be used to notify all active listeners.
 func NewStream() *Stream {
 	s := Stream{requests: make(chan request)}
 	go s.run()
 	return &s
 }
 
-// Send sends a new event to all listening clients.
+// Send sends a new event of type "message" to all listening clients.
 // It is equivalent to a call to SendEvent with event == "message".
-func (s *Stream) Send(data string) {
+func (s *Stream) Send(data []byte) {
 	s.SendEvent("message", data)
 }
 
-// SendEvent sends a new event to all listening clients, specifying the event type.
-func (s *Stream) SendEvent(event, data string) {
+// SendEvent sends a new event of given type to all listening clients.
+func (s *Stream) SendEvent(event string, data []byte) {
 	s.requests <- request{cmd: "notify", m: message{event: event, data: data}}
 }
 
@@ -69,12 +69,13 @@ func (s *Stream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 type request struct {
 	cmd string       // one of "subscribe", "leave", "notify"
-	c   chan message // only for "subscribe", "leave"
-	m   message      // only for "notify"
+	c   chan message // only for cmd == "subscribe", "leave"
+	m   message      // only for cmd == "notify"
 }
 
 type message struct {
-	event, data string
+	event string
+	data  []byte
 }
 
 func (s *Stream) run() {
@@ -98,6 +99,7 @@ func (s *Stream) run() {
 			}
 			s.logf("del subscriber: total %d", len(s.channels))
 		case "notify":
+			// TODO non-blocking writes with select default
 			for _, c := range s.channels {
 				c <- req.m
 			}
@@ -117,6 +119,7 @@ func (s *Stream) leave(c chan message) {
 	s.requests <- request{cmd: "leave", c: c}
 	for range c {
 		// Drain the channel
+		// TODO maybe useless with non-blocking writes
 	}
 }
 
