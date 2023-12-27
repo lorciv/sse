@@ -83,7 +83,7 @@ func (s *Stream) run() {
 		switch req.cmd {
 		case "subscribe":
 			s.channels = append(s.channels, req.c)
-			s.logf("new subscriber: total %d", len(s.channels))
+			s.logf("new listener: total %d", len(s.channels))
 		case "leave":
 			for i, c := range s.channels {
 				if c == req.c {
@@ -97,7 +97,7 @@ func (s *Stream) run() {
 					break
 				}
 			}
-			s.logf("del subscriber: total %d", len(s.channels))
+			s.logf("del listener: total %d", len(s.channels))
 		case "notify":
 			for _, c := range s.channels {
 				select {
