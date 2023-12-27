@@ -23,13 +23,13 @@ Clients that issue a GET request to the given path will receive events.
 Use the `Send` method to send events. Send accepts data as a slice of bytes.
 
 ```go
-s.Send([]bytes("42"))
+s.Send([]byte("42"))
 ```
 
 If you wish to specify the event type, use `SendEvent` instead.
 
 ```go
-s.SendEvent("count", []bytes("42"))
+s.SendEvent("count", []byte("42"))
 ```
 
 Arbitrarily complex data can be sent to the client as long as it is encoded as a byte slice.
