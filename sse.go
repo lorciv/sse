@@ -99,9 +99,13 @@ func (s *Stream) run() {
 			}
 			s.logf("del subscriber: total %d", len(s.channels))
 		case "notify":
-			// TODO non-blocking writes with select default
 			for _, c := range s.channels {
-				c <- req.m
+				select {
+				case c <- req.m:
+					// message sent
+				default:
+					s.logf("message dropped")
+				}
 			}
 		default:
 			panic("unexpected request type")
@@ -117,10 +121,6 @@ func (s *Stream) subscribe() chan message {
 
 func (s *Stream) leave(c chan message) {
 	s.requests <- request{cmd: "leave", c: c}
-	for range c {
-		// Drain the channel
-		// TODO maybe useless with non-blocking writes
-	}
 }
 
 func (s *Stream) logf(format string, v ...any) {
