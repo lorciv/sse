@@ -1,6 +1,6 @@
 # HTTP Server-Side Events
 
-Sse is a Go package that implents HTTP server-side events handling.
+Sse is a Go package that implents HTTP server-side events handling as per the HTML standard that can be found here: [https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events]().
 
 ```sh
 $ go get github.com/lorciv/sse
