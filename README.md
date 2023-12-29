@@ -1,6 +1,7 @@
-# HTTP Server-Side Events
+# HTTP Server-Sent Events
 
-Sse is a Go package that implents HTTP server-side events handling as per the HTML standard that can be found here: [https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events]().
+Sse is a Go package that implents HTTP server-sent events (SSE) handling.
+The standard for HTTP SSE can be found here: [https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events]().
 
 ```sh
 $ go get github.com/lorciv/sse
@@ -10,7 +11,7 @@ $ go get github.com/lorciv/sse
 
 The package exposes a function `NewStream` that can be used to instantiate a `Stream`.
 
-A Stream is a http.Handler, so it can be registered on a web server.
+A Stream is a http.Handler, so it can be registered on a http.ServeMux.
 Clients that issue a GET request to the given path will receive events as they are sent by the server.
 
 ```go
@@ -18,7 +19,7 @@ s := sse.NewStream()
 http.Handle("/stream", s)
 ```
 
-To send events on a stream, use its `Send` method.
+To send events on a stream, use the `Send` method.
 Send accepts the data to be sent as a slice of bytes.
 
 ```go
