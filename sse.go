@@ -128,3 +128,11 @@ func (s *Stream) logf(format string, v ...any) {
 		s.Logger.Printf(format, v...)
 	}
 }
+
+func (s *Stream) LeaveAll() {
+	var delChan []chan message
+	delChan = append(delChan, s.channels...)
+	for _, c := range delChan {
+		s.leave(c)
+	}
+}
